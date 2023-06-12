@@ -39,8 +39,8 @@ interface Props extends Themeable2 {
   onLogRowHover?: (row?: LogRowModel) => void;
   onOpenContext: (row: LogRowModel, onClose: () => void) => void;
   styles: LogRowStyles;
-  isFilterLabelActive?: (key: string, value: string) => boolean;
-  isFilterOutLabelActive?: (key: string, value: string) => boolean;
+  isFilterLabelActive?: (key: string, value: string) => Promise<boolean>;
+  isFilterOutLabelActive?: (key: string, value: string) => Promise<boolean>;
 }
 
 interface State {

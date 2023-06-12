@@ -50,8 +50,8 @@ interface LogsContainerProps extends PropsFromRedux {
   onStopScanning: () => void;
   eventBus: EventBus;
   splitOpenFn: SplitOpen;
-  isFilterLabelActive: (key: string, value: string) => boolean;
-  isFilterOutLabelActive: (key: string, value: string) => boolean;
+  isFilterLabelActive: (key: string, value: string) => Promise<boolean>;
+  isFilterOutLabelActive: (key: string, value: string) => Promise<boolean>;
 }
 
 class LogsContainer extends PureComponent<LogsContainerProps> {

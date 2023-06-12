@@ -85,8 +85,8 @@ interface Props extends Themeable2 {
   addResultsToCache: () => void;
   clearCache: () => void;
   eventBus: EventBus;
-  isFilterLabelActive: (key: string, value: string) => boolean;
-  isFilterOutLabelActive: (key: string, value: string) => boolean;
+  isFilterLabelActive: (key: string, value: string) => Promise<boolean>;
+  isFilterOutLabelActive: (key: string, value: string) => Promise<boolean>;
 }
 
 interface State {
