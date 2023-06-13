@@ -16,7 +16,6 @@ import {
   Selector,
   UnwrapExpr,
   String,
-  PipelineStage,
 } from '@grafana/lezer-logql';
 
 import { QueryBuilderLabelFilter } from '../prometheus/querybuilder/shared/types';
@@ -95,7 +94,7 @@ function getMatchersWithFilter(query: string, key: string, operator: string, val
       return false;
     }
     const labelValue = query.substring(valueNode.from, valueNode.to);
-    if (handleQuotes(labelValue) !== value) {
+    if (handleQuotes(labelValue) !== unescapeLabelValue(value)) {
       return false;
     }
     const labelOperator = query.substring(opNode.from, opNode.to);
