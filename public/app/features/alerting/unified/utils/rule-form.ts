@@ -96,6 +96,26 @@ function listifyLabelsOrAnnotations(item: Labels | Annotations | undefined): Arr
   return [...recordToArray(item || {}), { key: '', value: '' }];
 }
 
+//make sure default annotations are always shown in order even if empty
+function normalizeDefaultAnnotations(annotations: Array<{ key: string; value: string }>) {
+  const orderedAnnotations = [...annotations];
+  const defaultAnnotationKeys = defaultAnnotations.map((annotation) => annotation.key);
+
+  defaultAnnotationKeys.forEach((defaultAnnotationKey, index) => {
+    const fieldIndex = orderedAnnotations.findIndex((field) => field.key === defaultAnnotationKey);
+
+    if (fieldIndex === -1) {
+      //add the default annotation if abstent
+      const emptyValue = { key: defaultAnnotationKey, value: '' };
+      orderedAnnotations.splice(index, 0, emptyValue);
+    } else if (fieldIndex !== index) {
+      //move it to the correct position if present
+      orderedAnnotations.splice(index, 0, orderedAnnotations.splice(fieldIndex, 1)[0]);
+    }
+  });
+  return orderedAnnotations;
+}
+
 export function formValuesToRulerGrafanaRuleDTO(values: RuleFormValues): PostableRuleGrafanaRuleDTO {
   const { name, condition, noDataState, execErrState, evaluateFor, queries, isPaused } = values;
   if (condition) {
@@ -134,7 +154,7 @@ export function rulerRuleToFormValues(ruleWithLocation: RuleWithLocation): RuleF
         execErrState: ga.exec_err_state,
         queries: ga.data,
         condition: ga.condition,
-        annotations: listifyLabelsOrAnnotations(rule.annotations),
+        annotations: normalizeDefaultAnnotations(listifyLabelsOrAnnotations(rule.annotations)),
         labels: listifyLabelsOrAnnotations(rule.labels),
         folder: { title: namespace, id: ga.namespace_id },
         isPaused: ga.is_paused,
