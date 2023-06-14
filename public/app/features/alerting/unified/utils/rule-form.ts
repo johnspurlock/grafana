@@ -92,8 +92,15 @@ export function formValuesToRulerRuleDTO(values: RuleFormValues): RulerRuleDTO {
   throw new Error(`unexpected rule type: ${type}`);
 }
 
-function listifyLabelsOrAnnotations(item: Labels | Annotations | undefined): Array<{ key: string; value: string }> {
-  return [...recordToArray(item || {}), { key: '', value: '' }];
+function listifyLabelsOrAnnotations(
+  item: Labels | Annotations | undefined,
+  addEmpty: boolean
+): Array<{ key: string; value: string }> {
+  const list = [...recordToArray(item || {})];
+  if (addEmpty) {
+    list.push({ key: '', value: '' });
+  }
+  return list;
 }
 
 //make sure default annotations are always shown in order even if empty
@@ -154,8 +161,8 @@ export function rulerRuleToFormValues(ruleWithLocation: RuleWithLocation): RuleF
         execErrState: ga.exec_err_state,
         queries: ga.data,
         condition: ga.condition,
-        annotations: normalizeDefaultAnnotations(listifyLabelsOrAnnotations(rule.annotations)),
-        labels: listifyLabelsOrAnnotations(rule.labels),
+        annotations: normalizeDefaultAnnotations(listifyLabelsOrAnnotations(rule.annotations, false)),
+        labels: listifyLabelsOrAnnotations(rule.labels, true),
         folder: { title: namespace, id: ga.namespace_id },
         isPaused: ga.is_paused,
       };
@@ -205,8 +212,8 @@ export function alertingRulerRuleToRuleForm(
     expression: rule.expr,
     forTime,
     forTimeUnit,
-    annotations: listifyLabelsOrAnnotations(rule.annotations),
-    labels: listifyLabelsOrAnnotations(rule.labels),
+    annotations: listifyLabelsOrAnnotations(rule.annotations, false),
+    labels: listifyLabelsOrAnnotations(rule.labels, true),
   };
 }
 
@@ -216,7 +223,7 @@ export function recordingRulerRuleToRuleForm(
   return {
     name: rule.record,
     expression: rule.expr,
-    labels: listifyLabelsOrAnnotations(rule.labels),
+    labels: listifyLabelsOrAnnotations(rule.labels, true),
   };
 }
 
