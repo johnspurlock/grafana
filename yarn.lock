@@ -3750,9 +3750,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/experimental@npm:1.4.2":
-  version: 1.4.2
-  resolution: "@grafana/experimental@npm:1.4.2"
+"@grafana/experimental@npm:1.5.1":
+  version: 1.5.1
+  resolution: "@grafana/experimental@npm:1.5.1"
   dependencies:
     "@types/uuid": ^8.3.3
     uuid: ^8.3.2
@@ -3764,7 +3764,7 @@ __metadata:
     react: 17.0.2
     react-dom: 17.0.2
     react-select: ^5.2.1
-  checksum: 6e4d7f162ebc4c1a2746f7d0301e98a1634486d8e4c8adccdbab993139b06f46ccc85ab7233fdaaa93981b8b9ad8d68fb1b8542a0e6bba4f89e51707971a05db
+  checksum: 1c0670f7ee4b04bd8b9dc40643e990e11b16d43689bc5fb4ddb5be5315b2c71c0dbeb33f2f9bb9c472224ed396f742f4b2ff615b9b7b9409f0f0933cd897ed59
   languageName: node
   linkType: hard
 
@@ -18584,7 +18584,7 @@ __metadata:
     "@grafana/e2e-selectors": "workspace:*"
     "@grafana/eslint-config": 5.1.0
     "@grafana/eslint-plugin": "link:./packages/grafana-eslint-rules"
-    "@grafana/experimental": 1.4.2
+    "@grafana/experimental": 1.5.1
     "@grafana/faro-core": 1.1.0
     "@grafana/faro-web-sdk": 1.1.0
     "@grafana/google-sdk": 0.1.1
