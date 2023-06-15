@@ -128,6 +128,10 @@ export function addLabelToQuery(query: string, key: string, operator: string, va
   }
 
   const streamSelectorPositions = getStreamSelectorPositions(query);
+  if (!streamSelectorPositions.length) {
+    return query;
+  }
+
   const hasStreamSelectorMatchers = getMatcherInStreamPositions(query);
   const everyStreamSelectorHasMatcher = streamSelectorPositions.every((streamSelectorPosition) =>
     hasStreamSelectorMatchers.some(
@@ -137,9 +141,6 @@ export function addLabelToQuery(query: string, key: string, operator: string, va
   );
   const parserPositions = getParserPositions(query);
   const labelFilterPositions = getLabelFilterPositions(query);
-  if (!streamSelectorPositions.length) {
-    return query;
-  }
 
   const filter = toLabelFilter(key, value, operator);
   // If we have non-empty stream selector and parser/label filter, we want to add a new label filter after the last one.
@@ -166,6 +167,9 @@ export function addParserToQuery(query: string, parser: string): string {
     return addParser(query, lineFilterPositions, parser);
   } else {
     const streamSelectorPositions = getStreamSelectorPositions(query);
+    if (!streamSelectorPositions.length) {
+      return query;
+    }
     return addParser(query, streamSelectorPositions, parser);
   }
 }
@@ -483,6 +487,9 @@ function addLabelFormat(
 
 export function addLineFilter(query: string): string {
   const streamSelectorPositions = getStreamSelectorPositions(query);
+  if (!streamSelectorPositions.length) {
+    return query;
+  }
   const streamSelectorEnd = streamSelectorPositions[0].to;
 
   const newQueryExpr = query.slice(0, streamSelectorEnd) + ' |= ``' + query.slice(streamSelectorEnd);
