@@ -85,7 +85,7 @@ func TestClearCookieHeader(t *testing.T) {
 		req.AddCookie(&http.Cookie{Name: "cookie"})
 
 		ClearCookieHeader(req, datasources.AllowedCookies{
-			MatchOption:  datasources.MO_EXACT_MATCHING,
+			MatchOption:  datasources.MO_EXACT_MATCH,
 			MatchPattern: "",
 			KeepCookies:  []string{},
 		}, nil)
@@ -100,7 +100,7 @@ func TestClearCookieHeader(t *testing.T) {
 		req.AddCookie(&http.Cookie{Name: "cookie3"})
 
 		ClearCookieHeader(req, datasources.AllowedCookies{
-			MatchOption:  datasources.MO_EXACT_MATCHING,
+			MatchOption:  datasources.MO_EXACT_MATCH,
 			MatchPattern: "",
 			KeepCookies:  []string{"cookie1", "cookie3"},
 		}, nil)
@@ -116,7 +116,7 @@ func TestClearCookieHeader(t *testing.T) {
 		req.AddCookie(&http.Cookie{Name: "cookie3"})
 
 		ClearCookieHeader(req, datasources.AllowedCookies{
-			MatchOption:  datasources.MO_EXACT_MATCHING,
+			MatchOption:  datasources.MO_EXACT_MATCH,
 			MatchPattern: "",
 			KeepCookies:  []string{"cookie1", "cookie3"},
 		}, []string{"cookie3"})
@@ -132,7 +132,7 @@ func TestClearCookieHeader(t *testing.T) {
 		req.AddCookie(&http.Cookie{Name: "cookie3"})
 
 		ClearCookieHeader(req, datasources.AllowedCookies{
-			MatchOption:  datasources.MO_EXACT_MATCHING,
+			MatchOption:  datasources.MO_EXACT_MATCH,
 			MatchPattern: "",
 			KeepCookies:  []string{"cookie1", "cookie3"},
 		}, nil)
@@ -148,7 +148,7 @@ func TestClearCookieHeader(t *testing.T) {
 		req.AddCookie(&http.Cookie{Name: "cookie3"})
 
 		ClearCookieHeader(req, datasources.AllowedCookies{
-			MatchOption:  datasources.MO_REGEX_MATCHING,
+			MatchOption:  datasources.MO_REGEX_MATCH,
 			MatchPattern: `\w+`,
 			KeepCookies:  []string{"cookie1", "cookie3"},
 		}, []string{"cookie2"})
@@ -165,7 +165,7 @@ func TestClearCookieHeader(t *testing.T) {
 		req.AddCookie(&http.Cookie{Name: "cookie3"})
 
 		ClearCookieHeader(req, datasources.AllowedCookies{
-			MatchOption:  datasources.MO_REGEX_MATCHING,
+			MatchOption:  datasources.MO_REGEX_MATCH,
 			MatchPattern: "^special_.*",
 			KeepCookies:  []string{},
 		}, nil)
@@ -180,7 +180,7 @@ func TestClearCookieHeader(t *testing.T) {
 		req.AddCookie(&http.Cookie{Name: "special23"})
 
 		ClearCookieHeader(req, datasources.AllowedCookies{
-			MatchOption:  datasources.MO_REGEX_MATCHING,
+			MatchOption:  datasources.MO_REGEX_MATCH,
 			MatchPattern: "([abc",
 			KeepCookies:  []string{},
 		}, nil)

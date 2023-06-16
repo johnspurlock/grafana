@@ -22,7 +22,7 @@ func TestAllowedCookies(t *testing.T) {
 				"keepCookies": []string{"cookie2"},
 			},
 			want: AllowedCookies{
-				MatchOption:  MO_EXACT_MATCHING,
+				MatchOption:  MO_EXACT_MATCH,
 				MatchPattern: "",
 				KeepCookies:  []string{"cookie2"},
 			},
@@ -35,7 +35,7 @@ func TestAllowedCookies(t *testing.T) {
 				"allowedCookiePattern": "",
 			},
 			want: AllowedCookies{
-				MatchOption:  MO_EXACT_MATCHING,
+				MatchOption:  MO_EXACT_MATCH,
 				MatchPattern: "",
 				KeepCookies:  []string{"cookie2"},
 			},
@@ -48,7 +48,7 @@ func TestAllowedCookies(t *testing.T) {
 				"allowedCookiePattern": "",
 			},
 			want: AllowedCookies{
-				MatchOption:  MO_EXACT_MATCHING,
+				MatchOption:  MO_EXACT_MATCH,
 				MatchPattern: "",
 				KeepCookies:  []string{"cookie2"},
 			},
@@ -61,7 +61,7 @@ func TestAllowedCookies(t *testing.T) {
 				"allowedCookiePattern": "",
 			},
 			want: AllowedCookies{
-				MatchOption:  MO_EXACT_MATCHING,
+				MatchOption:  MO_EXACT_MATCH,
 				MatchPattern: "",
 				KeepCookies:  []string{"cookie2"},
 			},
@@ -70,11 +70,11 @@ func TestAllowedCookies(t *testing.T) {
 			desc: "Usual json data with regex pattern matching option provided",
 			given: map[string]interface{}{
 				"keepCookies":          []string{"cookie2"},
-				"allowedCookieOption":  "regex_matching",
+				"allowedCookieOption":  "regex_match",
 				"allowedCookiePattern": ".*",
 			},
 			want: AllowedCookies{
-				MatchOption:  MO_REGEX_MATCHING,
+				MatchOption:  MO_REGEX_MATCH,
 				MatchPattern: ".*",
 				KeepCookies:  []string{"cookie2"},
 			},
@@ -83,11 +83,11 @@ func TestAllowedCookies(t *testing.T) {
 			desc: "Json data with regex pattern matching option provided",
 			given: map[string]interface{}{
 				"keepCookies":          []string{"cookie2"},
-				"allowedCookieOption":  "regex_matching",
+				"allowedCookieOption":  "regex_match",
 				"allowedCookiePattern": `\w+`,
 			},
 			want: AllowedCookies{
-				MatchOption:  MO_REGEX_MATCHING,
+				MatchOption:  MO_REGEX_MATCH,
 				MatchPattern: `\w+`,
 				KeepCookies:  []string{"cookie2"},
 			},
@@ -96,11 +96,11 @@ func TestAllowedCookies(t *testing.T) {
 			desc: "Json data with regex pattern matching option provided and empty keepCookies",
 			given: map[string]interface{}{
 				"keepCookies":          []string{},
-				"allowedCookieOption":  "regex_matching",
+				"allowedCookieOption":  "regex_match",
 				"allowedCookiePattern": `^special_.*`,
 			},
 			want: AllowedCookies{
-				MatchOption:  MO_REGEX_MATCHING,
+				MatchOption:  MO_REGEX_MATCH,
 				MatchPattern: `^special_.*`,
 				KeepCookies:  []string{},
 			},
@@ -108,11 +108,11 @@ func TestAllowedCookies(t *testing.T) {
 		{
 			desc: "Json data with regex pattern matching option provided and no keepCookies",
 			given: map[string]interface{}{
-				"allowedCookieOption":  "regex_matching",
+				"allowedCookieOption":  "regex_match",
 				"allowedCookiePattern": `^special_.*`,
 			},
 			want: AllowedCookies{
-				MatchOption:  MO_REGEX_MATCHING,
+				MatchOption:  MO_REGEX_MATCH,
 				MatchPattern: `^special_.*`,
 				KeepCookies:  nil,
 			},

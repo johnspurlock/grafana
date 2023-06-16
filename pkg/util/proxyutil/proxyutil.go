@@ -47,7 +47,7 @@ func PrepareProxyRequest(req *http.Request) {
 func ClearCookieHeader(req *http.Request, allowedCookies datasources.AllowedCookies, skipCookiesNames []string) {
 	keepCookies := map[string]*http.Cookie{}
 
-	if allowedCookies.MatchOption == datasources.MO_EXACT_MATCHING {
+	if allowedCookies.MatchOption == datasources.MO_EXACT_MATCH {
 		for _, c := range req.Cookies() {
 			for _, v := range allowedCookies.KeepCookies {
 				if c.Name == v {
@@ -57,7 +57,7 @@ func ClearCookieHeader(req *http.Request, allowedCookies datasources.AllowedCook
 		}
 	}
 
-	if allowedCookies.MatchOption == datasources.MO_REGEX_MATCHING {
+	if allowedCookies.MatchOption == datasources.MO_REGEX_MATCH {
 		for _, c := range req.Cookies() {
 			re, err := regexp.Compile(allowedCookies.MatchPattern)
 			// Only match if the pattern is valid

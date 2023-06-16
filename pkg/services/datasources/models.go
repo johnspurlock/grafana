@@ -32,10 +32,10 @@ const (
 	CustomHeaderName = "httpHeaderName"
 	// CustomHeaderValue is the prefix that is used to store the value of a custom header.
 	CustomHeaderValue = "httpHeaderValue"
-	// MO_EXACT_MATCHING is for the allowed cookies. Cookie name must match exactly.
-	MO_EXACT_MATCHING = "exact_matching"
-	// MO_REGEX_MATCHING is for the allowed cookies. Cookie name must match with the provided regex.
-	MO_REGEX_MATCHING = "regex_matching"
+	// MO_EXACT_MATCH is for the allowed cookies. Cookie name must match exactly.
+	MO_EXACT_MATCH = "exact_match"
+	// MO_REGEX_MATCH is for the allowed cookies. Cookie name must match with the provided regex.
+	MO_REGEX_MATCH = "regex_match"
 )
 
 type DsAccess string
@@ -79,7 +79,7 @@ type AllowedCookies struct {
 func (ds DataSource) AllowedCookies() AllowedCookies {
 	// Default matching option is exact matching
 	ac := AllowedCookies{
-		MatchOption:  MO_EXACT_MATCHING,
+		MatchOption:  MO_EXACT_MATCH,
 		MatchPattern: "",
 		KeepCookies:  []string{},
 	}
@@ -98,7 +98,7 @@ func (ds DataSource) AllowedCookies() AllowedCookies {
 
 		if aco != nil {
 			acoStr := aco.MustString()
-			if acoStr == MO_EXACT_MATCHING || acoStr == MO_REGEX_MATCHING {
+			if acoStr == MO_EXACT_MATCH || acoStr == MO_REGEX_MATCH {
 				ac.MatchOption = acoStr
 			}
 		}
