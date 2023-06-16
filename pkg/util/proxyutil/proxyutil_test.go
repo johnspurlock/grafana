@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/grafana/grafana/pkg/services/datasources"
 	"github.com/grafana/grafana/pkg/services/user"
 )
 
@@ -83,7 +84,11 @@ func TestClearCookieHeader(t *testing.T) {
 		require.NoError(t, err)
 		req.AddCookie(&http.Cookie{Name: "cookie"})
 
-		ClearCookieHeader(req, nil, nil)
+		ClearCookieHeader(req, datasources.AllowedCookies{
+			MatchOption:  datasources.MO_EXACT_MATCHING,
+			MatchPattern: "",
+			KeepCookies:  []string{},
+		}, nil)
 		require.NotContains(t, req.Header, "Cookie")
 	})
 
@@ -94,7 +99,11 @@ func TestClearCookieHeader(t *testing.T) {
 		req.AddCookie(&http.Cookie{Name: "cookie2"})
 		req.AddCookie(&http.Cookie{Name: "cookie3"})
 
-		ClearCookieHeader(req, []string{"cookie1", "cookie3"}, nil)
+		ClearCookieHeader(req, datasources.AllowedCookies{
+			MatchOption:  datasources.MO_EXACT_MATCHING,
+			MatchPattern: "",
+			KeepCookies:  []string{"cookie1", "cookie3"},
+		}, nil)
 		require.Contains(t, req.Header, "Cookie")
 		require.Equal(t, "cookie1=; cookie3=", req.Header.Get("Cookie"))
 	})
@@ -106,9 +115,76 @@ func TestClearCookieHeader(t *testing.T) {
 		req.AddCookie(&http.Cookie{Name: "cookie2"})
 		req.AddCookie(&http.Cookie{Name: "cookie3"})
 
-		ClearCookieHeader(req, []string{"cookie1", "cookie3"}, []string{"cookie3"})
+		ClearCookieHeader(req, datasources.AllowedCookies{
+			MatchOption:  datasources.MO_EXACT_MATCHING,
+			MatchPattern: "",
+			KeepCookies:  []string{"cookie1", "cookie3"},
+		}, []string{"cookie3"})
 		require.Contains(t, req.Header, "Cookie")
 		require.Equal(t, "cookie1=", req.Header.Get("Cookie"))
+	})
+
+	t.Run("Clear cookie header with cookies to keep should clear Cookie header and keep cookies with matching option 'exact_match'", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodGet, "/", nil)
+		require.NoError(t, err)
+		req.AddCookie(&http.Cookie{Name: "cookie1"})
+		req.AddCookie(&http.Cookie{Name: "cookie2"})
+		req.AddCookie(&http.Cookie{Name: "cookie3"})
+
+		ClearCookieHeader(req, datasources.AllowedCookies{
+			MatchOption:  datasources.MO_EXACT_MATCHING,
+			MatchPattern: "",
+			KeepCookies:  []string{"cookie1", "cookie3"},
+		}, nil)
+		require.Contains(t, req.Header, "Cookie")
+		require.Equal(t, "cookie1=; cookie3=", req.Header.Get("Cookie"))
+	})
+
+	t.Run("Clear cookie header with cookies to keep should clear Cookie header and keep cookies with matching pattern but with empty matching option", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodGet, "/", nil)
+		require.NoError(t, err)
+		req.AddCookie(&http.Cookie{Name: "cookie1"})
+		req.AddCookie(&http.Cookie{Name: "cookie2"})
+		req.AddCookie(&http.Cookie{Name: "cookie3"})
+
+		ClearCookieHeader(req, datasources.AllowedCookies{
+			MatchOption:  datasources.MO_REGEX_MATCHING,
+			MatchPattern: `\w+`,
+			KeepCookies:  []string{"cookie1", "cookie3"},
+		}, []string{"cookie2"})
+		require.Contains(t, req.Header, "Cookie")
+		require.Equal(t, "cookie1=; cookie3=", req.Header.Get("Cookie"))
+	})
+
+	t.Run("Clear cookie header with cookie match pattern to keep and skip should clear Cookie header and keep cookies", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodGet, "/", nil)
+		require.NoError(t, err)
+		req.AddCookie(&http.Cookie{Name: "cookie1"})
+		req.AddCookie(&http.Cookie{Name: "special23"})
+		req.AddCookie(&http.Cookie{Name: "special_1asd987dsf9a"})
+		req.AddCookie(&http.Cookie{Name: "cookie3"})
+
+		ClearCookieHeader(req, datasources.AllowedCookies{
+			MatchOption:  datasources.MO_REGEX_MATCHING,
+			MatchPattern: "^special_.*",
+			KeepCookies:  []string{},
+		}, nil)
+		require.Contains(t, req.Header, "Cookie")
+		require.Equal(t, "special_1asd987dsf9a=", req.Header.Get("Cookie"))
+	})
+
+	t.Run("Clear cookie header with cookie should not match BAD pattern and return no cookies", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodGet, "/", nil)
+		require.NoError(t, err)
+		req.AddCookie(&http.Cookie{Name: "cookie1"})
+		req.AddCookie(&http.Cookie{Name: "special23"})
+
+		ClearCookieHeader(req, datasources.AllowedCookies{
+			MatchOption:  datasources.MO_REGEX_MATCHING,
+			MatchPattern: "([abc",
+			KeepCookies:  []string{},
+		}, nil)
+		require.NotContains(t, req.Header, "Cookie")
 	})
 }
 
