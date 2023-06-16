@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	jsoniter "github.com/json-iterator/go"
 	"gonum.org/v1/gonum/graph/simple"
 
 	"github.com/grafana/grafana/pkg/api/response"
@@ -68,7 +69,7 @@ func (m *MLNode) Execute(ctx context.Context, now time.Time, _ mathexp.Vars, s *
 		s.metrics.dsRequests.WithLabelValues(respStatus, fmt.Sprintf("%t", useDataplane)).Inc()
 	}()
 
-	resp, err := m.command.Execute(ctx, timeRange.From, timeRange.To, func(path string, payload []byte) ([]byte, error) {
+	resp, err := m.command.Execute(timeRange.From, timeRange.To, func(path string, payload []byte) ([]byte, error) {
 		crReq := &backend.CallResourceRequest{
 			PluginContext: pCtx,
 			Path:          path,
@@ -92,7 +93,13 @@ func (m *MLNode) Execute(ctx context.Context, now time.Time, _ mathexp.Vars, s *
 		if resp.Status() >= 200 && resp.Status() < 300 {
 			return resp.Body(), nil
 		}
-		return nil, fmt.Errorf("failed to send a POST request to plugin %s via proxy by path %s, status code: %v, msg:%s", mlPluginID, path, resp.Status(), resp.Body())
+
+		body := resp.Body()
+		errMsg := jsoniter.Get(body, "error").ToString()
+		if errMsg == "" { // if field does not exist or body is not a JSON, this string will be empty.
+			errMsg = string(body)
+		}
+		return nil, fmt.Errorf("request POST %s to plugin %s was unsuccessful, status code: %v, msg:%s", mlPluginID, path, resp.Status(), errMsg)
 	})
 
 	if err != nil {
