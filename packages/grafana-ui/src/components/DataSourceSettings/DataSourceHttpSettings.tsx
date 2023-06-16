@@ -41,7 +41,7 @@ const ALLOWED_COOKIE_PATTERN_OPTIONS: Array<SelectableValue<string>> = [
   {
     label: 'Regex match',
     value: 'regex_match',
-    description: 'Cookies that matches with the given regex pattern will be allowed',
+    description: 'Cookies that match with the given regex pattern will be allowed',
   },
 ];
 
