@@ -37,6 +37,13 @@ func main() {
 	}
 
 	var i *thema.Instance
+	// try to validate against the latest lineage. for this example we're going
+	// to continue through and run ValidateAny regardless of the outcome.
+	_, err = dk.Lineage().Latest().Validate(dashdata)
+	if err != nil {
+		fmt.Printf("validation against latest schema failed: %s", err.Error())
+	}
+
 	i = dk.Lineage().ValidateAny(dashdata)
 	if i == nil {
 		fmt.Println("ValidateAny returned a nil instance")
