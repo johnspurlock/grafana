@@ -334,6 +334,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
           defaultUrl="http://localhost:8086"
           onChange={onOptionsChange}
           secureSocksDSProxyEnabled={config.secureSocksDSProxyEnabled}
+          allowedCookiePatternEnabled={true}
         />
 
         <div className="gf-form-group">
