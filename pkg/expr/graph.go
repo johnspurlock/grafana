@@ -176,7 +176,7 @@ func (s *Service) buildGraph(req *Request) (*simple.DirectedGraph, error) {
 		case TypeCMDNode:
 			node, err = buildCMDNode(dp, rn)
 		case TypeMLNode:
-			node, err = s.buildMlNode(dp, rn, req)
+			node, err = s.buildMLNode(dp, rn, req)
 			if err != nil {
 				err = fmt.Errorf("fail to parse expression with refID %v: %w", rn.RefID, err)
 			}

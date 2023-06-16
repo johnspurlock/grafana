@@ -113,7 +113,7 @@ func (m *MLNode) Execute(ctx context.Context, now time.Time, _ mathexp.Vars, s *
 	return result, err
 }
 
-func (s *Service) buildMlNode(dp *simple.DirectedGraph, rn *rawNode, req *Request) (Node, error) {
+func (s *Service) buildMLNode(dp *simple.DirectedGraph, rn *rawNode, req *Request) (Node, error) {
 	if rn.TimeRange == nil {
 		return nil, errors.New("time range must be specified")
 	}
