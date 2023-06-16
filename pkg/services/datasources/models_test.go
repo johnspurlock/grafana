@@ -138,5 +138,4 @@ func TestAllowedCookies(t *testing.T) {
 			assert.EqualValues(t, test.want.KeepCookies, actual.KeepCookies)
 		})
 	}
-
 }
