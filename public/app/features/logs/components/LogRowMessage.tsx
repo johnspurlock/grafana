@@ -16,7 +16,7 @@ interface Props {
   wrapLogMessage: boolean;
   prettifyLogMessage: boolean;
   app?: CoreApp;
-  showContextToggle?: (row?: LogRowModel) => boolean;
+  showContextToggle?: (row?: LogRowModel) => Promise<boolean>;
   onOpenContext: (row: LogRowModel) => void;
   styles: LogRowStyles;
 }
@@ -59,6 +59,10 @@ const restructureLog = memoizeOne((line: string, prettifyLogMessage: boolean): s
 });
 
 export class LogRowMessage extends PureComponent<Props> {
+  state = {
+    showContext: false,
+  };
+
   onShowContextClick = (e: React.SyntheticEvent<HTMLElement, Event>) => {
     const { onOpenContext } = this.props;
     e.stopPropagation();
@@ -75,11 +79,18 @@ export class LogRowMessage extends PureComponent<Props> {
     return restructureLog(raw, prettifyLogMessage);
   };
 
+  componentDidMount() {
+    const { row, showContextToggle } = this.props;
+    const shouldShowContextPromise = showContextToggle ? showContextToggle(row) : Promise.resolve(false);
+    shouldShowContextPromise.then((shouldShowContext) => {
+      this.setState({ showContext: shouldShowContext });
+    });
+  }
+
   render() {
-    const { row, wrapLogMessage, prettifyLogMessage, showContextToggle, styles } = this.props;
+    const { row, wrapLogMessage, prettifyLogMessage, styles } = this.props;
     const { hasAnsi, raw } = row;
     const restructuredEntry = restructureLog(raw, prettifyLogMessage);
-    const shouldShowContextToggle = showContextToggle ? showContextToggle(row) : false;
 
     return (
       <>
@@ -101,7 +112,7 @@ export class LogRowMessage extends PureComponent<Props> {
         </td>
         <td className={cx('log-row-menu-cell', styles.logRowMenuCell)}>
           <span className={cx('log-row-menu', styles.rowMenu)} onClick={this.onLogRowClick}>
-            {shouldShowContextToggle && (
+            {this.state.showContext && (
               <IconButton
                 size="md"
                 name="gf-show-context"
