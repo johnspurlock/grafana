@@ -1,8 +1,7 @@
 package ml
 
 import (
-	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -21,7 +20,7 @@ func (c OutlierCommand) DatasourceUID() string {
 	return c.datasourceUID
 }
 
-func (c OutlierCommand) Execute(_ context.Context, from, to time.Time, execute func(path string, payload []byte) ([]byte, error)) (*backend.QueryDataResponse, error) {
+func (c OutlierCommand) Execute(from, to time.Time, execute func(path string, payload []byte) ([]byte, error)) (*backend.QueryDataResponse, error) {
 	var dataMap map[string]interface{}
 	err := json.Unmarshal(c.query, &dataMap)
 	if err != nil {
@@ -60,44 +59,40 @@ func (c OutlierCommand) Execute(_ context.Context, from, to time.Time, execute f
 	if err != nil {
 		return nil, fmt.Errorf("cannot umarshall response from plugin API: %w", err)
 	}
+	if len(resp.Error) > 0 {
+		return nil, errors.New(resp.Error)
+	}
 	return resp.Data, nil
 }
 
-func unmarshalOutlierCommand(data map[string]interface{}, interval time.Duration, appURL string) (*OutlierCommand, error) {
-	uid, err := readValue[string](data, "datasource_uid")
-	if err != nil {
-		return nil, err
+func unmarshalOutlierCommand(q jsoniter.Any, appURL string) (*OutlierCommand, error) {
+	interval := defaultInterval
+	switch intervalNode := q.Get("intervalMs"); intervalNode.ValueType() {
+	case jsoniter.NilValue:
+	case jsoniter.InvalidValue:
+	case jsoniter.NumberValue:
+		interval = time.Duration(intervalNode.ToInt64()) * time.Millisecond
+	default:
+		return nil, fmt.Errorf("field `intervalMs` is expected to be a number")
 	}
 
-	// TODO validate the data? What if ML API changes?
-	/* data is expected to be like
-			{
-				"datasource_uid": "prometheus",
-	            "datasource_type": "prometheus",
-	            "query_params": {
-	                "expr": "go_goroutines",
-	                "range": true,
-	                "refId": "A"
-	            },
-				"algorithm": {
-	                "name": "dbscan",
-	                "config": {
-	                    "epsilon": 0.2354
-	                },
-	                "sensitivity": 0.9
-	            },
-	            "response_type": "binary"
-			}
-	*/
+	cfgNode := q.Get("config")
+	if cfgNode.ValueType() != jsoniter.ObjectValue {
+		return nil, fmt.Errorf("field `config` is required and should be object")
+	}
+	ds := cfgNode.Get("datasource_uid").ToString()
+	if len(ds) == 0 {
+		return nil, fmt.Errorf("field `config.datasource_uid` is required and should be string")
+	}
 
-	d, err := json.Marshal(data)
+	d, err := json.Marshal(cfgNode.GetInterface())
 	if err != nil {
 		return nil, err
 	}
 
 	return &OutlierCommand{
 		query:         d,
-		datasourceUID: uid,
+		datasourceUID: ds,
 		interval:      interval,
 		appURL:        appURL,
 	}, nil

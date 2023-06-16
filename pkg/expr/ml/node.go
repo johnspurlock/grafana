@@ -1,14 +1,15 @@
 package ml
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	jsoniter "github.com/json-iterator/go"
 )
 
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 const (
 	Outlier CommandType = "outlier"
@@ -21,35 +22,21 @@ const (
 
 type Command interface {
 	DatasourceUID() string
-	Execute(ctx context.Context, from, to time.Time, executor func(path string, payload []byte) ([]byte, error)) (*backend.QueryDataResponse, error)
+	Execute(from, to time.Time, executor func(path string, payload []byte) ([]byte, error)) (*backend.QueryDataResponse, error)
 }
 
 type CommandType string
 
-
 func UnmarshalCommand(query map[string]interface{}, appURL string) (Command, error) {
-	mlType, err := readValue[string](query, "type")
-	if err != nil {
-		return nil, err
+	q := jsoniter.Wrap(query)
+	typeNode := q.Get("type")
+	if typeNode.ValueType() != jsoniter.StringValue {
+		return nil, fmt.Errorf("field 'type' is required and should be string")
 	}
 
-	intervalMs, err := readOptionalValue[float64](query, "intervalMs")
-	if err != nil {
-		return nil, err
-	}
-	interval := defaultInterval
-	if intervalMs != nil {
-		interval = time.Duration(*intervalMs) * time.Millisecond
-	}
-
-	d, err := readValue[map[string]interface{}](query, "data")
-	if err != nil {
-		return nil, err
-	}
-
-	switch strings.ToLower(mlType) {
+	switch mlType := strings.ToLower(typeNode.ToString()); mlType {
 	case string(Outlier):
-		return unmarshalOutlierCommand(d, interval, appURL)
+		return unmarshalOutlierCommand(q, appURL)
 	default:
 		return nil, fmt.Errorf("unsupported command type '%v'. Supported only '%s'", mlType, Outlier)
 	}
