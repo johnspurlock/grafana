@@ -5,36 +5,42 @@ import { DataSourceHttpSettings } from '@grafana/ui';
 
 import { HttpSettingsProps } from './types';
 
+const jsonData = {
+  timeInterval: '15s',
+  httpMode: 'GET',
+  keepCookies: ['cookie1', 'cookie2'],
+};
+
+const secureJsonData = {
+  password: true,
+};
+
+const dataSourceConfig = {
+  id: 4,
+  uid: 'x',
+  orgId: 1,
+  name: 'gdev-influxdb',
+  type: 'influxdb',
+  typeName: 'Influxdb',
+  typeLogoUrl: '',
+  access: 'direct',
+  url: 'http://localhost:8086',
+  user: 'grafana',
+  database: 'site',
+  basicAuth: false,
+  basicAuthUser: '',
+  withCredentials: false,
+  isDefault: false,
+  jsonData,
+  secureJsonData,
+  secureJsonFields: {},
+  readOnly: true,
+};
+
 const setup = (propOverrides?: object) => {
   const onChange = jest.fn();
   const props: HttpSettingsProps = {
-    dataSourceConfig: {
-      id: 4,
-      uid: 'x',
-      orgId: 1,
-      name: 'gdev-influxdb',
-      type: 'influxdb',
-      typeName: 'Influxdb',
-      typeLogoUrl: '',
-      access: 'direct',
-      url: 'http://localhost:8086',
-      user: 'grafana',
-      database: 'site',
-      basicAuth: false,
-      basicAuthUser: '',
-      withCredentials: false,
-      isDefault: false,
-      jsonData: {
-        timeInterval: '15s',
-        httpMode: 'GET',
-        keepCookies: ['cookie1', 'cookie2'],
-      },
-      secureJsonData: {
-        password: true,
-      },
-      secureJsonFields: {},
-      readOnly: true,
-    },
+    dataSourceConfig,
     onChange,
     ...propOverrides,
     defaultUrl: '',
@@ -71,5 +77,95 @@ describe('DataSourceHttpSettings', () => {
       },
     });
     expect(screen.getByText(expectedText)).toBeInTheDocument();
+  });
+
+  describe('allowed cookies', () => {
+    it('should render TagsInput component if there is no allowed cookie option in the jsonData', () => {
+      const expectedPlaceHolder = 'New tag (enter key to add)';
+      const expectedCookie1 = 'cookie1';
+      const expectedCookie2 = 'cookie2';
+      setup({
+        dataSourceConfig: {
+          ...dataSourceConfig,
+          access: 'proxy',
+        },
+      });
+      expect(screen.getByPlaceholderText(expectedPlaceHolder)).toBeInTheDocument();
+      expect(screen.getByText(expectedCookie1)).toBeInTheDocument();
+      expect(screen.getByText(expectedCookie2)).toBeInTheDocument();
+    });
+
+    it('should render TagsInput component if allowedCookiePatternEnabled is false or undefined', () => {
+      const expectedPlaceHolder = 'New tag (enter key to add)';
+      const expectedCookie1 = 'cookie1';
+      const expectedCookie2 = 'cookie2';
+      setup({
+        allowedCookiePatternEnabled: false,
+        dataSourceConfig: {
+          ...dataSourceConfig,
+          access: 'proxy',
+          jsonData: {
+            ...jsonData,
+          },
+        },
+      });
+      expect(screen.getByPlaceholderText(expectedPlaceHolder)).toBeInTheDocument();
+      expect(screen.getByText(expectedCookie1)).toBeInTheDocument();
+      expect(screen.getByText(expectedCookie2)).toBeInTheDocument();
+    });
+
+    it('should render TagsInput component even if allowedCookiePatternEnabled is true without providing allowedCookieOption', () => {
+      const expectedPlaceHolder = 'New tag (enter key to add)';
+      const expectedCookie1 = 'cookie1';
+      const expectedCookie2 = 'cookie2';
+      setup({
+        allowedCookiePatternEnabled: true,
+        dataSourceConfig: {
+          ...dataSourceConfig,
+          access: 'proxy',
+          jsonData: {
+            ...jsonData,
+          },
+        },
+      });
+      expect(screen.getByPlaceholderText(expectedPlaceHolder)).toBeInTheDocument();
+      expect(screen.getByText(expectedCookie1)).toBeInTheDocument();
+      expect(screen.getByText(expectedCookie2)).toBeInTheDocument();
+    });
+
+    it('should render Regex pattern input component if allowedCookiePatternEnabled is true', () => {
+      const expectedPlaceHolder = 'Regex pattern';
+      setup({
+        allowedCookiePatternEnabled: true,
+        dataSourceConfig: {
+          ...dataSourceConfig,
+          access: 'proxy',
+          jsonData: {
+            ...jsonData,
+            allowedCookieOption: 'regex_match',
+          },
+        },
+      });
+      expect(screen.getByPlaceholderText(expectedPlaceHolder)).toBeInTheDocument();
+    });
+
+    it('should render Regex pattern input component with value', () => {
+      const expectedPlaceHolder = 'Regex pattern';
+      const expectedPattern = '.*';
+      setup({
+        allowedCookiePatternEnabled: true,
+        dataSourceConfig: {
+          ...dataSourceConfig,
+          access: 'proxy',
+          jsonData: {
+            ...jsonData,
+            allowedCookieOption: 'regex_match',
+            allowedCookiePattern: '.*',
+          },
+        },
+      });
+      expect(screen.getByPlaceholderText(expectedPlaceHolder)).toBeInTheDocument();
+      expect(screen.getByDisplayValue(expectedPattern)).toBeInTheDocument();
+    });
   });
 });
