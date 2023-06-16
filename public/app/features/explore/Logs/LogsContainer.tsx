@@ -51,7 +51,6 @@ interface LogsContainerProps extends PropsFromRedux {
   eventBus: EventBus;
   splitOpenFn: SplitOpen;
   isFilterLabelActive: (key: string, value: string) => Promise<boolean>;
-  isFilterOutLabelActive: (key: string, value: string) => Promise<boolean>;
 }
 
 class LogsContainer extends PureComponent<LogsContainerProps> {
@@ -209,7 +208,6 @@ class LogsContainer extends PureComponent<LogsContainerProps> {
             clearCache={() => clearCache(exploreId)}
             eventBus={this.props.eventBus}
             isFilterLabelActive={this.props.isFilterLabelActive}
-            isFilterOutLabelActive={this.props.isFilterOutLabelActive}
           />
         </LogsCrossFadeTransition>
       </>
