@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/services/contexthandler"
@@ -16,11 +17,14 @@ const cookieHeaderName = "Cookie"
 // NewCookiesMiddleware creates a new plugins.ClientMiddleware that will
 // forward incoming HTTP request Cookies to outgoing plugins.Client requests
 // if the datasource has enabled forwarding of cookies (keepCookies).
-func NewCookiesMiddleware(skipCookiesNames []string) plugins.ClientMiddleware {
+// Remove features when FlagAllowedCookieRegexPattern is removed
+func NewCookiesMiddleware(skipCookiesNames []string, isFlagAllowedCookieRegexPattern bool) plugins.ClientMiddleware {
 	return plugins.ClientMiddlewareFunc(func(next plugins.Client) plugins.Client {
 		return &CookiesMiddleware{
 			next:             next,
 			skipCookiesNames: skipCookiesNames,
+			// Remove features when FlagAllowedCookieRegexPattern is removed
+			isFlagAllowedCookieRegexPattern: isFlagAllowedCookieRegexPattern,
 		}
 	})
 }
@@ -28,6 +32,8 @@ func NewCookiesMiddleware(skipCookiesNames []string) plugins.ClientMiddleware {
 type CookiesMiddleware struct {
 	next             plugins.Client
 	skipCookiesNames []string
+	// Remove features when FlagAllowedCookieRegexPattern is removed
+	isFlagAllowedCookieRegexPattern bool
 }
 
 func (m *CookiesMiddleware) applyCookies(ctx context.Context, pCtx backend.PluginContext, req interface{}) error {
@@ -50,7 +56,7 @@ func (m *CookiesMiddleware) applyCookies(ctx context.Context, pCtx backend.Plugi
 		Updated:  settings.Updated,
 	}
 
-	proxyutil.ClearCookieHeader(reqCtx.Req, ds.AllowedCookies(), m.skipCookiesNames)
+	proxyutil.ClearCookieHeader(reqCtx.Req, ds.AllowedCookies(m.isFlagAllowedCookieRegexPattern), m.skipCookiesNames)
 
 	cookieStr := reqCtx.Req.Header.Get(cookieHeaderName)
 	switch t := req.(type) {

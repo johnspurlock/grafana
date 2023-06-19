@@ -132,7 +132,7 @@ func TestAllowedCookies(t *testing.T) {
 				UID:      "test",
 			}
 
-			actual := ds.AllowedCookies()
+			actual := ds.AllowedCookies(false)
 			assert.Equal(t, test.want.MatchOption, actual.MatchOption)
 			assert.Equal(t, test.want.MatchPattern, actual.MatchPattern)
 			assert.EqualValues(t, test.want.KeepCookies, actual.KeepCookies)

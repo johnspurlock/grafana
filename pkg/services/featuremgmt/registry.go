@@ -579,11 +579,10 @@ var (
 			Owner:        grafanaObservabilityTracesAndProfilingSquad,
 		},
 		{
-			Name:         "allowedCookieRegexPattern",
-			Description:  "Enables regular expression matcher for allowed cookies",
-			Stage:        FeatureStageExperimental,
-			FrontendOnly: true,
-			Owner:        grafanaObservabilityMetricsSquad,
+			Name:        "allowedCookieRegexPattern",
+			Description: "Enables regular expression matcher for allowed cookies",
+			Stage:       FeatureStageExperimental,
+			Owner:       grafanaObservabilityMetricsSquad,
 		},
 	}
 )

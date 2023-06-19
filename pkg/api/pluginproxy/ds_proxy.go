@@ -20,6 +20,7 @@ import (
 	"github.com/grafana/grafana/pkg/plugins"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
 	"github.com/grafana/grafana/pkg/services/datasources"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/oauthtoken"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/util"
@@ -224,7 +225,8 @@ func (proxy *DataSourceProxy) director(req *http.Request) {
 
 	proxyutil.ApplyUserHeader(proxy.cfg.SendUserHeader, req, proxy.ctx.SignedInUser)
 
-	proxyutil.ClearCookieHeader(req, proxy.ds.AllowedCookies(), []string{proxy.cfg.LoginCookieName})
+	IsFeatureToggleEnabled := proxy.cfg.IsFeatureToggleEnabled(featuremgmt.FlagAllowedCookieRegexPattern)
+	proxyutil.ClearCookieHeader(req, proxy.ds.AllowedCookies(IsFeatureToggleEnabled), []string{proxy.cfg.LoginCookieName})
 	req.Header.Set("User-Agent", proxy.cfg.DataProxyUserAgent)
 
 	jsonData := make(map[string]interface{})

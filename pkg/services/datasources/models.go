@@ -76,7 +76,7 @@ type AllowedCookies struct {
 
 // AllowedCookies parses the jsondata.KeepCookies and returns a list of
 // allowed cookies, otherwise an empty list.
-func (ds DataSource) AllowedCookies() AllowedCookies {
+func (ds DataSource) AllowedCookies(isFlagAllowedCookieRegexPattern bool) AllowedCookies {
 	// Default matching option is exact matching
 	ac := AllowedCookies{
 		MatchOption:  MO_EXACT_MATCH,
@@ -92,15 +92,21 @@ func (ds DataSource) AllowedCookies() AllowedCookies {
 			ac.KeepCookies = kc.MustStringArray()
 		}
 
-		if acp != nil {
-			ac.MatchPattern = acp.MustString()
-		}
-
-		if aco != nil {
-			acoStr := aco.MustString()
-			if acoStr == MO_EXACT_MATCH || acoStr == MO_REGEX_MATCH {
-				ac.MatchOption = acoStr
+		// Remove this check when FlagAllowedCookieRegexPattern is removed
+		if isFlagAllowedCookieRegexPattern {
+			if acp != nil {
+				ac.MatchPattern = acp.MustString()
 			}
+
+			if aco != nil {
+				acoStr := aco.MustString()
+				if acoStr == MO_EXACT_MATCH || acoStr == MO_REGEX_MATCH {
+					ac.MatchOption = acoStr
+				}
+			}
+		} else {
+			ac.MatchPattern = ""
+			ac.MatchOption = MO_EXACT_MATCH
 		}
 	}
 

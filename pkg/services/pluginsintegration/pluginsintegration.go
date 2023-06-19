@@ -120,7 +120,7 @@ func CreateMiddlewares(cfg *setting.Cfg, oAuthTokenService oauthtoken.OAuthToken
 		clientmiddleware.NewTracingHeaderMiddleware(),
 		clientmiddleware.NewClearAuthHeadersMiddleware(),
 		clientmiddleware.NewOAuthTokenMiddleware(oAuthTokenService),
-		clientmiddleware.NewCookiesMiddleware(skipCookiesNames),
+		clientmiddleware.NewCookiesMiddleware(skipCookiesNames, features.IsEnabled(featuremgmt.FlagAllowedCookieRegexPattern)),
 		clientmiddleware.NewResourceResponseMiddleware(),
 	}
 

@@ -6,9 +6,10 @@ import (
 	"testing"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/stretchr/testify/require"
+
 	"github.com/grafana/grafana/pkg/plugins/manager/client/clienttest"
 	"github.com/grafana/grafana/pkg/services/user"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCookiesMiddleware(t *testing.T) {
@@ -30,7 +31,7 @@ func TestCookiesMiddleware(t *testing.T) {
 
 		cdt := clienttest.NewClientDecoratorTest(t,
 			clienttest.WithReqContext(req, &user.SignedInUser{}),
-			clienttest.WithMiddlewares(NewCookiesMiddleware([]string{"grafana_session"})),
+			clienttest.WithMiddlewares(NewCookiesMiddleware([]string{"grafana_session"}, false)),
 		)
 
 		jsonDataMap := map[string]interface{}{}
@@ -99,7 +100,7 @@ func TestCookiesMiddleware(t *testing.T) {
 
 		cdt := clienttest.NewClientDecoratorTest(t,
 			clienttest.WithReqContext(req, &user.SignedInUser{}),
-			clienttest.WithMiddlewares(NewCookiesMiddleware([]string{"grafana_session"})),
+			clienttest.WithMiddlewares(NewCookiesMiddleware([]string{"grafana_session"}, false)),
 		)
 
 		jsonDataMap := map[string]interface{}{
