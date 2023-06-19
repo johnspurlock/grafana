@@ -381,7 +381,11 @@ func TestDataSourceProxy_routeRule(t *testing.T) {
 		quotaService := quotatest.New(false, nil)
 		dsService, err := datasourceservice.ProvideService(nil, secretsService, secretsStore, cfg, featuremgmt.WithFeatures(), acmock.New(), acmock.NewMockedPermissionsService(), quotaService)
 		require.NoError(t, err)
-		proxy, err := NewDataSourceProxy(ds, routes, ctx, "/render", &setting.Cfg{BuildVersion: "5.3.0"}, httpClientProvider, &oauthtoken.Service{}, dsService, tracer)
+		proxy, err := NewDataSourceProxy(ds, routes, ctx, "/render", &setting.Cfg{BuildVersion: "5.3.0",
+			// remove this when FlagAllowedCookieRegexPattern is removed
+			IsFeatureToggleEnabled: func(key string) bool {
+				return false
+			}}, httpClientProvider, &oauthtoken.Service{}, dsService, tracer)
 		require.NoError(t, err)
 		req, err := http.NewRequest(http.MethodGet, "http://grafana.com/sub", nil)
 		require.NoError(t, err)
