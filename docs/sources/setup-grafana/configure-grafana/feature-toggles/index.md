@@ -114,6 +114,7 @@ Experimental features might be changed or removed without prior notice.
 | `cloudWatchLogsMonacoEditor`       | Enables the Monaco editor for CloudWatch Logs queries                                                        |
 | `exploreScrollableLogsContainer`   | Improves the scrolling behavior of logs in Explore                                                           |
 | `recordedQueriesMulti`             | Enables writing multiple items from a single query within Recorded Queries                                   |
+| `allowedCookieRegexPattern`        | Enables regular expression matcher for allowed cookies                                                       |
 
 ## Development feature toggles
 

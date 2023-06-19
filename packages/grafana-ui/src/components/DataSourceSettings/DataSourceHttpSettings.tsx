@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { SelectableValue } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 
+import { config } from '../../../../../public/app/core/config';
 import { useTheme2 } from '../../themes';
 import { FormField } from '../FormField/FormField';
 import { InlineFormLabel } from '../FormLabel/FormLabel';
@@ -206,7 +207,8 @@ export const DataSourceHttpSettings = (props: HttpSettingsProps) => {
                 >
                   Allowed cookies
                 </InlineFormLabel>
-                {allowedCookiePatternEnabled &&
+                {config.featureToggles.allowedCookieRegexPattern &&
+                allowedCookiePatternEnabled &&
                 dataSourceConfig.jsonData.allowedCookieOption === ALLOWED_COOKIE_PATTERN_OPTIONS[1].value ? (
                   <div className="width-20">
                     <Input
@@ -230,7 +232,7 @@ export const DataSourceHttpSettings = (props: HttpSettingsProps) => {
                     disabled={dataSourceConfig.readOnly}
                   />
                 )}
-                {allowedCookiePatternEnabled && (
+                {config.featureToggles.allowedCookieRegexPattern && allowedCookiePatternEnabled && (
                   <Select
                     aria-label="Cookie pattern"
                     className="width-10 gf-form-input"

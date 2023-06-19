@@ -338,4 +338,8 @@ const (
 	// FlagRecordedQueriesMulti
 	// Enables writing multiple items from a single query within Recorded Queries
 	FlagRecordedQueriesMulti = "recordedQueriesMulti"
+
+	// FlagAllowedCookieRegexPattern
+	// Enables regular expression matcher for allowed cookies
+	FlagAllowedCookieRegexPattern = "allowedCookieRegexPattern"
 )
