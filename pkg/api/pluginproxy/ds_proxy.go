@@ -225,8 +225,12 @@ func (proxy *DataSourceProxy) director(req *http.Request) {
 
 	proxyutil.ApplyUserHeader(proxy.cfg.SendUserHeader, req, proxy.ctx.SignedInUser)
 
-	IsFeatureToggleEnabled := proxy.cfg.IsFeatureToggleEnabled(featuremgmt.FlagAllowedCookieRegexPattern)
-	proxyutil.ClearCookieHeader(req, proxy.ds.AllowedCookies(IsFeatureToggleEnabled), []string{proxy.cfg.LoginCookieName})
+	// remove this when FlagAllowedCookieRegexPattern is removed
+	isFeatureToggleEnabled := false
+	if proxy.cfg.IsFeatureToggleEnabled != nil {
+		isFeatureToggleEnabled = proxy.cfg.IsFeatureToggleEnabled(featuremgmt.FlagAllowedCookieRegexPattern)
+	}
+	proxyutil.ClearCookieHeader(req, proxy.ds.AllowedCookies(isFeatureToggleEnabled), []string{proxy.cfg.LoginCookieName})
 	req.Header.Set("User-Agent", proxy.cfg.DataProxyUserAgent)
 
 	jsonData := make(map[string]interface{})
