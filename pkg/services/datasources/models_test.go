@@ -15,6 +15,8 @@ func TestAllowedCookies(t *testing.T) {
 		desc  string
 		given map[string]interface{}
 		want  AllowedCookies
+		// remove this then FlagAllowedCookieRegexPattern is removed
+		isFlagAllowedCookieRegexPatternEnabled bool
 	}{
 		{
 			desc: "Usual json data without any pattern matching option provided",
@@ -78,6 +80,7 @@ func TestAllowedCookies(t *testing.T) {
 				MatchPattern: ".*",
 				KeepCookies:  []string{"cookie2"},
 			},
+			isFlagAllowedCookieRegexPatternEnabled: true,
 		},
 		{
 			desc: "Json data with regex pattern matching option provided",
@@ -91,6 +94,7 @@ func TestAllowedCookies(t *testing.T) {
 				MatchPattern: `\w+`,
 				KeepCookies:  []string{"cookie2"},
 			},
+			isFlagAllowedCookieRegexPatternEnabled: true,
 		},
 		{
 			desc: "Json data with regex pattern matching option provided and empty keepCookies",
@@ -104,6 +108,7 @@ func TestAllowedCookies(t *testing.T) {
 				MatchPattern: `^special_.*`,
 				KeepCookies:  []string{},
 			},
+			isFlagAllowedCookieRegexPatternEnabled: true,
 		},
 		{
 			desc: "Json data with regex pattern matching option provided and no keepCookies",
@@ -116,6 +121,7 @@ func TestAllowedCookies(t *testing.T) {
 				MatchPattern: `^special_.*`,
 				KeepCookies:  nil,
 			},
+			isFlagAllowedCookieRegexPatternEnabled: true,
 		},
 	}
 
@@ -132,7 +138,7 @@ func TestAllowedCookies(t *testing.T) {
 				UID:      "test",
 			}
 
-			actual := ds.AllowedCookies(false)
+			actual := ds.AllowedCookies(test.isFlagAllowedCookieRegexPatternEnabled)
 			assert.Equal(t, test.want.MatchOption, actual.MatchOption)
 			assert.Equal(t, test.want.MatchPattern, actual.MatchPattern)
 			assert.EqualValues(t, test.want.KeepCookies, actual.KeepCookies)
